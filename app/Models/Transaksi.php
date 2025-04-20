@@ -2,19 +2,34 @@
 
 namespace App\Models;
 
+use App\Models\Alamat;
+use App\Models\Keranjang;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class Transaksi extends Model
 {
-    use HasFactory;
-    protected $table = 'transaksi_item';
-    protected $primaryKey = 'transaksi_item_id';
+    protected $table = 'transaksi';
+    protected $primaryKey = 'transaksi_id';
     protected $fillable = [
-        'id_transaksi',
-        'id_produk',
-        'id_user',
-        'israted',
-        'quantity'
+        'total',
+        'status',
+        'id_alamat',
+        'resi',
+        'tanggal_transaksi',
+        'snaptoken'
     ];
+
+    public function Keranjang(): HasMany
+    {
+        return $this->hasMany(Keranjang::class, 'id_transaksi', 'transaksi_id');
+    }
+
+    public function alamat(): belongsTo
+    {
+        return $this->belongsTo(Alamat::class, 'id_alamat', 'alamat_id');
+    }
 }

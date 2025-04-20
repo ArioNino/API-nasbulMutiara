@@ -8,55 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AlamatController extends Controller
 {
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'label_alamat' => 'required',
-            'nama_penerima' => 'required',
-            'no_telepon' => 'required',
-            'detail' => 'required',
-            'kelurahan' => 'required',
-            'kecamatan' => 'required',
-            'kabupaten' => 'required',
-            'provinsi' => 'required',
-            'catatan_kurir' => 'nullable|string',
-        ]);
-        $user = Auth::user();
-        $cari = Alamat::where('id_user', $user->user_id)->get();
-        if (!$cari) {
-            Alamat::create([
-                'id_user' => Auth::user()->user_id,
-                'label_alamat' => $data['label_alamat'],
-                'nama_penerima' => $data['nama_penerima'],
-                'no_telepon' => $data['no_telepon'],
-                'detail' => $data['detail'],
-                'kelurahan' => $data['kelurahan'],
-                'kecamatan' => $data['kecamatan'],
-                'kabupaten' => $data['kabupaten'],
-                'provinsi' => $data['provinsi'],
-                'isPrimary' => 1,
-                'catatan_kurir' => $data['catatan_kurir'],
-            ]);
-        } elseif ($cari) {
-            Alamat::create([
-                'id_user' => Auth::user()->user_id,
-                'label_alamat' => $data['label_alamat'],
-                'nama_penerima' => $data['nama_penerima'],
-                'no_telepon' => $data['no_telepon'],
-                'detail' => $data['detail'],
-                'kelurahan' => $data['kelurahan'],
-                'kecamatan' => $data['kecamatan'],
-                'kabupaten' => $data['kabupaten'],
-                'provinsi' => $data['provinsi'],
-                'isPrimary' => 0,
-                'catatan_kurir' => $data['catatan_kurir'],
-            ]);
-        }
-        return response()->json([
-            'message' => 'Alamat berhasil ditambah'
-        ]);
-    }
-
+    // NI NGEBUG
     public function show()
     {
         $user = Auth::user();
@@ -79,12 +31,59 @@ class AlamatController extends Controller
         return response()->json(($allAlamat));
     }
 
+    public function store(Request $request)
+    {
+        $data = $request->validate([
+            'label_alamat' => 'required',
+            'no_telepon' => 'required',
+            'detail' => 'required',
+            'kelurahan' => 'required',
+            'kecamatan' => 'required',
+            'kabupaten' => 'required',
+            'provinsi' => 'required',
+            'catatan_kurir' => 'nullable|string',
+        ]);
+        $user = Auth::user();
+        $cari = Alamat::where('id_user', $user->user_id)->get();
+        if (!$cari) {
+            Alamat::create([
+                'id_user' => Auth::user()->user_id,
+                'label_alamat' => $data['label_alamat'],
+                'nama_penerima' => Auth::user()->name,
+                'no_telepon' => $data['no_telepon'],
+                'detail' => $data['detail'],
+                'kelurahan' => $data['kelurahan'],
+                'kecamatan' => $data['kecamatan'],
+                'kabupaten' => $data['kabupaten'],
+                'provinsi' => $data['provinsi'],
+                'isPrimary' => 1,
+                'catatan_kurir' => $data['catatan_kurir'],
+            ]);
+        } elseif ($cari) {
+            Alamat::create([
+                'id_user' => Auth::user()->user_id,
+                'label_alamat' => $data['label_alamat'],
+                'nama_penerima' => Auth::user()->name,
+                'no_telepon' => $data['no_telepon'],
+                'detail' => $data['detail'],
+                'kelurahan' => $data['kelurahan'],
+                'kecamatan' => $data['kecamatan'],
+                'kabupaten' => $data['kabupaten'],
+                'provinsi' => $data['provinsi'],
+                'isPrimary' => 0,
+                'catatan_kurir' => $data['catatan_kurir'],
+            ]);
+        }
+        return response()->json([
+            'message' => 'Alamat berhasil ditambah'
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
         $cari = Alamat::findOrFail($id);
         $data = $request->validate([
             'label_alamat' => 'required',
-            'nama_penerima' => 'required',
             'no_telepon' => 'required',
             'detail' => 'required',
             'kelurahan' => 'required',
@@ -116,6 +115,7 @@ class AlamatController extends Controller
         }
     }
 
+    // NI NGEBUG
     public function utama($id)
     {
         $user = Auth::user();

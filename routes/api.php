@@ -1,10 +1,13 @@
 <?php
 
+use App\Models\Transaksi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\alamatController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\TransaksiController;
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
@@ -20,6 +23,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/alamat/{id}', [AlamatController::class, 'update']);
     Route::delete('/alamat/delete/{id}', [AlamatController::class, 'destroy']);
     Route::get('/alamat/primary/{id}', [AlamatController::class, 'utama']);
+
+    Route::get('/keranjang', [KeranjangController::class, 'show']);
+    Route::post('/keranjang/add', [KeranjangController::class, 'add']);
+    Route::delete('/keranjang/delete/{id}', [KeranjangController::class, 'delete']);
+
+    Route::post('/bayar', [TransaksiController::class, 'store']);
 });
 
 Route::post('/register', [AuthController::class, 'register']);
