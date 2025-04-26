@@ -28,6 +28,7 @@ class ProdukController extends Controller
         $validated = $request->validate([
             'nama_produk' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
+            'ukuran' => 'required|string|max:255',
             'deskripsi' => 'required|string',
             'harga' => 'required|numeric',
             'gambar' => 'nullable|string',
@@ -49,6 +50,7 @@ class ProdukController extends Controller
         $request->validate([
             'nama_produk' => 'required|string|max:255',
             'kategori' => 'required|string|max:255',
+            'ukuran' => 'required|string|max:255',
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric',
             'gambar' => 'nullable|string',

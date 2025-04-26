@@ -18,8 +18,6 @@ class Transaksi extends Model
         'total',
         'status',
         'id_alamat',
-        'resi',
-        'tanggal_transaksi',
         'snaptoken'
     ];
 

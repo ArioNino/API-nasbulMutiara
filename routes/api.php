@@ -17,6 +17,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/produk/delete/{id}', [ProdukController::class, 'destroy']);
     });
     Route::get('/logout', [AuthController::class, 'logout']);
+    Route::get('/aboutMe', [AuthController::class, 'aboutMe']);
+    Route::post('/aboutMe/update', [AuthController::class, 'update']);
 
     Route::get('/alamat', [AlamatController::class, 'show']);
     Route::post('/alamat/add', [AlamatController::class, 'store']);
@@ -28,7 +30,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/keranjang/add', [KeranjangController::class, 'add']);
     Route::delete('/keranjang/delete/{id}', [KeranjangController::class, 'delete']);
 
-    Route::post('/bayar', [TransaksiController::class, 'store']);
+    Route::get('/transaksi', [TransaksiController::class, 'show']);
+    Route::get('/bayar/{id}', [TransaksiController::class, 'store']);
+    Route::get('/bayar/berhasil/{id}', [TransaksiController::class, 'berhasil']);
+    Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
 });
 
 Route::post('/register', [AuthController::class, 'register']);
