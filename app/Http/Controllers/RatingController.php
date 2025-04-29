@@ -32,14 +32,12 @@ class RatingController extends Controller
                         'ukuran' => $item->produk->ukuran,
                         'harga' => $item->produk->harga,
                         'quantity' => $item->quantity,
-                        'gambar' => url('/storage/' . $item->produk->gambar),
                     ];
 
                     if ($item->israted == 1 && $item->rating) {
                         $itemData['rating'] = [
                             'rating_value' => $item->rating->rating,
                             'comment' => $item->rating->comment,
-                            'gambar' => $item->rating->gambar ? url('/storage/' . $item->rating->gambar) : null
                         ];
                     }
 
