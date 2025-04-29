@@ -98,6 +98,16 @@ class TransaksiController extends Controller
         ]);
     }
 
+    public function sampai($id){
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->update([
+            'status'=>'delivered'
+        ]);
+        return response()->json([
+            'message' => 'Makanan sudah sampai ke tempat tujuan'
+        ]);
+    }
+
     #Customer dashboard MY ORDER
     public function show()
     {
@@ -181,5 +191,4 @@ class TransaksiController extends Controller
 
         return response()->json($response);
     }
-
 }

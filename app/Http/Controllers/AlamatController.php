@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alamat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\AlamatResource;
 
 class AlamatController extends Controller
 {
@@ -17,7 +18,7 @@ class AlamatController extends Controller
             ->where('isPrimary', 1)
             ->first();
 
-        if(!$primaryAlamat){
+        if (!$primaryAlamat) {
             return response()->json([
                 'message' => 'Kamu belum ada alamat utama'
             ], 403);
@@ -41,15 +42,16 @@ class AlamatController extends Controller
             'kecamatan' => 'required',
             'kabupaten' => 'required',
             'provinsi' => 'required',
-            'catatan_kurir' => 'nullable|string',
         ]);
+
         $user = Auth::user();
-        $cari = Alamat::where('id_user', $user->user_id)->get();
+        $cari = Alamat::where('id_user', $user->user_id)->exists();
+
         if (!$cari) {
             Alamat::create([
-                'id_user' => Auth::user()->user_id,
+                'id_user' => $user->user_id,
                 'label_alamat' => $data['label_alamat'],
-                'nama_penerima' => Auth::user()->name,
+                'nama_penerima' => $user->name,
                 'no_telepon' => $data['no_telepon'],
                 'detail' => $data['detail'],
                 'kelurahan' => $data['kelurahan'],
@@ -57,13 +59,12 @@ class AlamatController extends Controller
                 'kabupaten' => $data['kabupaten'],
                 'provinsi' => $data['provinsi'],
                 'isPrimary' => 1,
-                'catatan_kurir' => $data['catatan_kurir'],
             ]);
-        } elseif ($cari) {
+        } else {
             Alamat::create([
-                'id_user' => Auth::user()->user_id,
+                'id_user' => $user->user_id,
                 'label_alamat' => $data['label_alamat'],
-                'nama_penerima' => Auth::user()->name,
+                'nama_penerima' => $user->name,
                 'no_telepon' => $data['no_telepon'],
                 'detail' => $data['detail'],
                 'kelurahan' => $data['kelurahan'],
@@ -71,13 +72,14 @@ class AlamatController extends Controller
                 'kabupaten' => $data['kabupaten'],
                 'provinsi' => $data['provinsi'],
                 'isPrimary' => 0,
-                'catatan_kurir' => $data['catatan_kurir'],
             ]);
         }
+
         return response()->json([
             'message' => 'Alamat berhasil ditambah'
         ]);
     }
+
 
     public function update(Request $request, $id)
     {
@@ -132,7 +134,3 @@ class AlamatController extends Controller
         ]);
     }
 }
-
-
-
-

@@ -37,7 +37,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/ulasan/{id}', [RatingController::class, 'rating']);
 
     Route::get('/transaksi', [TransaksiController::class, 'show']);
-    Route::get('/bayar/{id}', [TransaksiController::class, 'store']);
+    Route::get('/bayar', [TransaksiController::class, 'store']);
     Route::get('/bayar/berhasil/{id}', [TransaksiController::class, 'berhasil']);
     Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
 });

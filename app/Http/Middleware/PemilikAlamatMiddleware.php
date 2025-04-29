@@ -3,11 +3,12 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use App\Models\Alamat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class KurirMiddleware
+class PemilikAlamatMiddleware
 {
     /**
      * Handle an incoming request.
@@ -16,11 +17,12 @@ class KurirMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Auth::user()->role == 'kurir'){
+        $user = Auth::user();
+        $alamat = Alamat::findOrFail($request->id);
+        if ($alamat->id_user != $user->user_id) {
+            return response()->json('Alamat not found', 404);
+        } else {
             return $next($request);
-        }
-        else{
-            return response()->json('kamu bukan kurir');
         }
     }
 }
