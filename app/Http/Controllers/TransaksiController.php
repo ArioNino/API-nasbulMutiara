@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class TransaksiController extends Controller
 {
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $user = Auth::user();
         $data = $request->validate([
             'total' => 'required',
@@ -20,14 +21,14 @@ class TransaksiController extends Controller
 
         foreach ($request->id_item as $id_item) {
             $cari = Keranjang::findOrFail($id_item);
-            if($cari->id_transaksi){
+            if ($cari->id_transaksi) {
                 return response()->json([
                     'message' => 'Item sudah memiliki transaksi.'
-                ],405);
+                ], 405);
             }
             $produk = $cari->produk;
             $stockBaru = $produk->stok - $cari->quantity;
-            if($stockBaru < 0){
+            if ($stockBaru < 0) {
                 return response()->json([
                     'message' => 'Ada barang yang stoknya habis'
                 ], 400);
@@ -75,34 +76,37 @@ class TransaksiController extends Controller
         ]);
     }
 
-    public function berhasil($id){
+    public function berhasil($id)
+    {
         $transaksi = Transaksi::findOrFail($id);
         $transaksi->update([
-            'status'=>'success'
+            'status' => 'success'
         ]);
         return response()->json([
             'message' => 'Transaksi berhasil dibayar'
         ]);
     }
 
-    public function gagal($id){
+    public function gagal($id)
+    {
         $transaksi = Transaksi::findOrFail($id);
         $transaksi->update([
-            'status'=>'failed'
+            'status' => 'failed'
         ]);
         return response()->json([
             'message' => 'Transaksi digagalkan'
         ]);
     }
 
-    public function show(){
+    #Customer dashboard MY ORDER
+    public function show()
+    {
         $user = Auth::user();
-
         $transaksi = Transaksi::whereHas('keranjang', function ($query) use ($user) {
             $query->where('id_user', $user->user_id);
         })
-        ->with(['keranjang.produk'])
-        ->latest()->get();
+            ->with(['keranjang.produk'])
+            ->latest()->get();
 
 
         $response = $transaksi->map(function ($transaksi) {
@@ -127,4 +131,55 @@ class TransaksiController extends Controller
 
         return response()->json($response);
     }
+
+    // Admin dashboard bagian ORDER
+    public function all()
+    {
+        $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])
+            ->latest()
+            ->get();
+
+        $response = $transaksi->map(function ($transaksi) {
+            return [
+                'transaksi_id' => $transaksi->transaksi_id,
+                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
+                'nama_pembeli' => $transaksi->alamat->nama_penerima,
+                'total_harga' => $transaksi->total,
+                'status' => $transaksi->status
+            ];
+        });
+
+        return response()->json($response);
+    }
+
+    // Admin dashboard bagian CUSTOMER
+    public function customer() {
+        $user = Auth::user();
+        $transaksi = Transaksi::with(['alamat'])
+                              ->whereHas('keranjang', function ($query) use ($user) {
+                                  $query->where('id_user', $user->user_id);
+                              })
+                              ->latest()
+                              ->get();
+
+        if ($transaksi->isEmpty()) {
+            return response()->json([
+                'message' => 'Tidak ada transaksi ditemukan untuk pengguna ini.'
+            ], 404);
+        }
+
+        $totalSpent = $transaksi->sum('total');
+        $lastTransaction = $transaksi->first();
+
+        $response = [
+            'nama_pembeli' => $lastTransaction->alamat->nama_penerima,
+            'total_spent' => $totalSpent,
+            'last_transaction' => [
+                'total_harga' => $lastTransaction->total,
+            ],
+        ];
+
+        return response()->json($response);
+    }
+
 }

@@ -18,7 +18,6 @@ class Rating extends Model
         'id_keranjang',
         'rating',
         'comment',
-        'gambar'
     ];
     public function Keranjang(): BelongsTo
     {
