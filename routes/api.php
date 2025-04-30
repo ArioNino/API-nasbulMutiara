@@ -25,7 +25,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/alamat', [AlamatController::class, 'show']);
     Route::post('/alamat/add', [AlamatController::class, 'store']);
-    Route::post('/alamat/{id}', [AlamatController::class, 'update']);
+    Route::post('/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/alamat/delete/{id}', [AlamatController::class, 'destroy']);
     Route::get('/alamat/primary/{id}', [AlamatController::class, 'utama']);
 
@@ -40,6 +40,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/bayar', [TransaksiController::class, 'store']);
     Route::get('/bayar/berhasil/{id}', [TransaksiController::class, 'berhasil']);
     Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
+    Route::get('/masak/{id}', [TransaksiController::class, 'masak'])->middleware('admin');
+    Route::get('/otw/{id}', [TransaksiController::class, 'otw'])->middleware('admin');
+    Route::get('/sampai/{id}', [TransaksiController::class, 'sampai']);//->middleware('kurir');
 });
 
 Route::post('/register', [AuthController::class, 'register']);

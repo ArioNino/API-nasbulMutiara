@@ -23,7 +23,6 @@ class Alamat extends Model
         'kabupaten',
         'provinsi',
         'isPrimary',
-        'catatan_kurir'
     ];
 
     public function user():BelongsTo

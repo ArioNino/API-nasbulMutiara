@@ -10,13 +10,14 @@ use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
-    public function unrated(){
+    public function unrated()
+    {
         $user = Auth::user();
         $transaksi = Transaksi::where('status', 'delivered')->whereHas('keranjang', function ($query) use ($user) {
             $query->where('id_user', $user->user_id);
         })
-        ->with(['keranjang.produk', 'keranjang.rating'])
-        ->get();
+            ->with(['keranjang.produk', 'keranjang.rating'])
+            ->get();
 
         $response = $transaksi->map(function ($transaksi) {
             return [
@@ -48,50 +49,60 @@ class RatingController extends Controller
         return response()->json($response);
     }
 
-    // Masih bug
-    public function rating(Request $request, $id){
+    // INI MASIH NGEBUG
+    public function rating(Request $request, $id)
+    {
         $user = Auth::user();
         $data = $request->validate([
-            'rating' => "required"
+            'rating' => "required|integer|between:1,5",
+            'comment' => 'nullable|string|max:255',
         ]);
+
         $keranjang = Keranjang::with('transaksi')->find($id);
-        if(!$keranjang->id_transaksi){
+
+        if (!$keranjang) {
+            return response()->json([
+                'message' => 'Keranjang tidak ditemukan'
+            ], 404);
+        }
+
+        if (!$keranjang->id_transaksi) {
             return response()->json([
                 'message' => 'Produk belum dibeli'
             ], 405);
-        }else{
-            if ($keranjang->isRated == true) {
-                return response()->json([
-                    'message' => 'Sudah dirating.'
-                ], 405);
-            }else{
-                if($keranjang->transaksi->status == 'delivered'){
-                    $rating = Rating::create([
-                        'id_user'=>$user->user_id,
-                        'id_transaksi_item'=> $id,
-                        'rating'=>$request->rating,
-                        'comment'=>$request->comment,
-                    ]);
-                    $keranjang->update([
-                        'israted' => true
-                    ]);
-                    return response()->json([
-                        'message' => 'Rating berhasil ditambahkan'
-                    ]);
-                }
-                else{
-                    return response()->json([
-                        'message' => 'Pastikan makananmu sudah sampai yaa:)'
-                    ], 405);
-                }
-            }
+        }
+
+        if ($keranjang->isRated == true) {
+            return response()->json([
+                'message' => 'Sudah dirating.'
+            ], 405);
+        }
+
+        if ($keranjang->transaksi->status == 'delivered') {
+            $rating = Rating::create([
+                'id_transaksi_item' => $id,
+                'rating' => $request->rating,
+                'comment' => $request->comment,
+            ]);
+
+            $keranjang->update([
+                'isRated' => true
+            ]);
+
+            return response()->json([
+                'message' => 'Rating berhasil ditambahkan'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Pastikan barangmu sudah sampai yaa:)'
+            ], 405);
         }
     }
+
 
     public static function quickRandom($length = 16)
     {
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
     }
-
 }

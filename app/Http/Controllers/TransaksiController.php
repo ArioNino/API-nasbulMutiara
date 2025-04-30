@@ -98,10 +98,33 @@ class TransaksiController extends Controller
         ]);
     }
 
-    public function sampai($id){
+    public function masak($id)
+    {
         $transaksi = Transaksi::findOrFail($id);
         $transaksi->update([
-            'status'=>'delivered'
+            'status' => 'on process'
+        ]);
+        return response()->json([
+            'message' => 'Makanan sedang dibuat dengan sepenuh hati:)'
+        ]);
+    }
+
+    public function otw($id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->update([
+            'status' => 'on deliver'
+        ]);
+        return response()->json([
+            'message' => 'Makanan sedang dikirim'
+        ]);
+    }
+
+    public function sampai($id)
+    {
+        $transaksi = Transaksi::findOrFail($id);
+        $transaksi->update([
+            'status' => 'delivered'
         ]);
         return response()->json([
             'message' => 'Makanan sudah sampai ke tempat tujuan'
@@ -162,33 +185,40 @@ class TransaksiController extends Controller
         return response()->json($response);
     }
 
-    // Admin dashboard bagian CUSTOMER
-    public function customer() {
-        $user = Auth::user();
-        $transaksi = Transaksi::with(['alamat'])
-                              ->whereHas('keranjang', function ($query) use ($user) {
-                                  $query->where('id_user', $user->user_id);
-                              })
-                              ->latest()
-                              ->get();
+    //Admin Dashboard bagian Customer
+    public function customer()
+    {
+        $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])
+            ->where('status', 'delivered')
+            ->latest()
+            ->get();
 
-        if ($transaksi->isEmpty()) {
-            return response()->json([
-                'message' => 'Tidak ada transaksi ditemukan untuk pengguna ini.'
-            ], 404);
+        $Customers = [];
+
+        foreach ($transaksi as $item) {
+            $namaPenerima = $item->alamat->nama_penerima;
+
+            $alamatDetail = $item->alamat->detail;
+            $kelurahan = $item->alamat->kelurahan;
+            $kecamatan = $item->alamat->kecamatan;
+            $kabupaten = $item->alamat->kabupaten;
+            $provinsi = $item->alamat->provinsi;
+
+            $alamatLengkap = "{$alamatDetail} {$kelurahan} {$kecamatan} {$kabupaten} {$provinsi}";
+
+            if (!isset($Customers[$namaPenerima])) {
+                $Customers[$namaPenerima] = [
+                    'Nama' => $namaPenerima,
+                    'Alamat' => $alamatLengkap,
+                    'total_spent' => 0,
+                    'last_spent' => $item->total,
+                ];
+            }
+
+            $Customers[$namaPenerima]['total_spent'] += $item->total;
         }
 
-        $totalSpent = $transaksi->sum('total');
-        $lastTransaction = $transaksi->first();
-
-        $response = [
-            'nama_pembeli' => $lastTransaction->alamat->nama_penerima,
-            'total_spent' => $totalSpent,
-            'last_transaction' => [
-                'total_harga' => $lastTransaction->total,
-            ],
-        ];
-
+        $response = array_values($Customers);
         return response()->json($response);
     }
 }

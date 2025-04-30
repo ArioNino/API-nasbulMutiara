@@ -46,20 +46,20 @@ class KeranjangController extends Controller
         return response()->json(KeranjangResource::collection($cari));
     }
 
-    public function delete($id)
-    {
-        $produk = Keranjang::findOrFail($id);
-        $produk->delete();
-        return response()->json(['message' => 'Item berhasil dihapus dari keranjang']);
+    public function delete(Request $request){
+        foreach ($request->id_item as $id_item) {
+            $cari = Keranjang::findOrFail($id_item);
+            $cari->delete();
+        }
+        return response()->json([
+            'message' => 'Item berhasil dihapus dari keranjang'
+        ]);
     }
-
-    // public function delete(Request $request){
-    //     foreach ($request->id_item as $id_item) {
-    //         $cari = Keranjang::findOrFail($id_item);
-    //         $cari->delete();
-    //     }
-    //     return response()->json([
-    //         'message' => 'Keranjang berhasil dihapus'
-    //     ]);
-    // }
 }
+
+// public function delete($id)
+// {
+//     $produk = Keranjang::findOrFail($id);
+//     $produk->delete();
+//     return response()->json(['message' => 'Keranjang berhasil dihapus']);
+// }

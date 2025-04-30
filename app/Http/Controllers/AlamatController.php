@@ -9,7 +9,6 @@ use App\Http\Resources\AlamatResource;
 
 class AlamatController extends Controller
 {
-    // NI NGEBUG
     public function show()
     {
         $user = Auth::user();
@@ -117,7 +116,6 @@ class AlamatController extends Controller
         }
     }
 
-    // NI NGEBUG
     public function utama($id)
     {
         $user = Auth::user();
