@@ -20,8 +20,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dashboard', [DashController::class, 'index']);
         Route::get('/dashboard/order', [DashController::class, 'order']);
         Route::get('/dashboard/customer', [DashController::class, 'customer']);
-
-        Route::get('/transaksi', [DashController::class, 'myOrder']);
     });
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/aboutMe', [AuthController::class, 'aboutMe']);
@@ -46,6 +44,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/masak/{id}', [TransaksiController::class, 'masak'])->middleware('admin');
     Route::get('/otw/{id}', [TransaksiController::class, 'otw'])->middleware('admin');
     Route::get('/sampai/{id}', [TransaksiController::class, 'sampai']);//->middleware('kurir');
+
+    Route::get('/transaksi', [DashController::class, 'myOrder']); //Customer Dashboard
 });
 
 Route::post('/register', [AuthController::class, 'register']);
