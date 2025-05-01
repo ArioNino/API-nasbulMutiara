@@ -2,23 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Keranjang;
 use App\Models\Transaksi;
 use App\Models\User;
 
 class DashController extends Controller
 {
+    // Admin Dashboard
     public function index()
     {
         $totalTransaksi = Transaksi::count();
         $transaksiDelivered = Transaksi::where('status', 'delivered')->count();
-        // $totalCustomer = User::whereHas('alamat.transaksi')->count();
         $totalNominal = Transaksi::sum('total');
+        $totalCustomer = Keranjang::whereHas('transaksi', function($query) {
+            $query->whereNotNull('id_transaksi');
+        })
+        ->distinct('id_user')
+        ->count('id_user');
 
         return response()->json([
             'income_money' => $totalNominal,
             'total_order' => $totalTransaksi,
             'total_delivered' => $transaksiDelivered,
-            // 'total_customer' => $totalCustomer,
+            'total_customer' => $totalCustomer,
         ]);
     }
 
