@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Keranjang;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Alamat;
 
 class DashController extends Controller
 {
@@ -14,11 +15,11 @@ class DashController extends Controller
         $totalTransaksi = Transaksi::count();
         $transaksiDelivered = Transaksi::where('status', 'delivered')->count();
         $totalNominal = Transaksi::sum('total');
-        $totalCustomer = Keranjang::whereHas('transaksi', function($query) {
+        $totalCustomer = Keranjang::whereHas('transaksi', function ($query) {
             $query->whereNotNull('id_transaksi');
         })
-        ->distinct('id_user')
-        ->count('id_user');
+            ->distinct('id_user')
+            ->count('id_user');
 
         return response()->json([
             'income_money' => $totalNominal,
@@ -48,10 +49,10 @@ class DashController extends Controller
         return response()->json($response);
     }
 
-    //Admin Dashboard bagian Customer //MASIH SALAH
+    //Admin Dashboard bagian Customer
     public function customer()
     {
-        $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])
+        $transaksi = Transaksi::with(['keranjang.produk', 'alamat']) // ambil semua alamat (termasuk non-primary)
             ->where('status', 'delivered')
             ->latest()
             ->get();
@@ -59,13 +60,29 @@ class DashController extends Controller
         $Customers = [];
 
         foreach ($transaksi as $item) {
-            $namaPenerima = $item->alamat->nama_penerima;
+            $alamat = $item->alamat;
 
-            $alamatDetail = $item->alamat->detail;
-            $kelurahan = $item->alamat->kelurahan;
-            $kecamatan = $item->alamat->kecamatan;
-            $kabupaten = $item->alamat->kabupaten;
-            $provinsi = $item->alamat->provinsi;
+            if (!$alamat || $alamat->isPrimary != 1) {
+                if ($alamat && $alamat->id_user) {
+                    $alamatUtama = Alamat::where('id_user', $alamat->id_user)
+                        ->where('isPrimary', 1)
+                        ->first();
+
+                    if ($alamatUtama) {
+                        $alamat = $alamatUtama;
+                    }
+                }
+            }
+
+            if (!$alamat) continue;
+
+            $namaPenerima = $alamat->nama_penerima;
+
+            $alamatDetail = $alamat->detail;
+            $kelurahan = $alamat->kelurahan;
+            $kecamatan = $alamat->kecamatan;
+            $kabupaten = $alamat->kabupaten;
+            $provinsi = $alamat->provinsi;
 
             $alamatLengkap = "{$alamatDetail} {$kelurahan} {$kecamatan} {$kabupaten} {$provinsi}";
 
