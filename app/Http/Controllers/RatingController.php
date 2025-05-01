@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Auth;
 
 class RatingController extends Controller
 {
-    public function unrated()
-    {
+    public function unrated(){
         $user = Auth::user();
         $transaksi = Transaksi::where('status', 'delivered')->whereHas('keranjang', function ($query) use ($user) {
             $query->where('id_user', $user->user_id);
         })
-            ->with(['keranjang.produk', 'keranjang.rating'])
-            ->get();
+        ->with(['keranjang.produk', 'keranjang.rating'])
+        ->get();
 
         $response = $transaksi->map(function ($transaksi) {
             return [
@@ -49,54 +48,47 @@ class RatingController extends Controller
         return response()->json($response);
     }
 
-    // INI MASIH NGEBUG
-    public function rating(Request $request, $id)
-    {
+    public function rating(Request $request, $keranjang_id) {
         $user = Auth::user();
-        $data = $request->validate([
-            'rating' => "required|integer|between:1,5",
-            'comment' => 'nullable|string|max:255',
+
+        // Validasi data input
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5', // rating antara 1 dan 5
+            'comment' => 'nullable|string|max:255', // komentar opsional
         ]);
 
-        $keranjang = Keranjang::with('transaksi')->find($id);
+        // Cek apakah keranjang milik user yang sedang login
+        $keranjang = Keranjang::where('keranjang_id', $keranjang_id)
+            ->whereHas('transaksi', function ($query) use ($user) {
+                $query->where('status', 'delivered')
+                      ->where('id_user', $user->user_id);
+            })
+            ->first();
 
+        // Jika keranjang tidak ditemukan atau tidak milik user, return error
         if (!$keranjang) {
-            return response()->json([
-                'message' => 'Keranjang tidak ditemukan'
-            ], 404);
+            return response()->json(['message' => 'Keranjang tidak ditemukan atau bukan milik anda.'], 404);
         }
 
-        if (!$keranjang->id_transaksi) {
-            return response()->json([
-                'message' => 'Produk belum dibeli'
-            ], 405);
-        }
+        // Menyimpan rating dan komentar
+        $rating = new Rating();
+        $rating->keranjang_id = $keranjang->keranjang_id;
+        $rating->rating = $request->rating;
+        $rating->comment = $request->comment;
+        $rating->save();
 
-        if ($keranjang->isRated == true) {
-            return response()->json([
-                'message' => 'Sudah dirating.'
-            ], 405);
-        }
+        // Update status israted pada keranjang menjadi 1
+        $keranjang->israted = 1;
+        $keranjang->save();
 
-        if ($keranjang->transaksi->status == 'delivered') {
-            $rating = Rating::create([
-                'id_transaksi_item' => $id,
-                'rating' => $request->rating,
-                'comment' => $request->comment,
-            ]);
-
-            $keranjang->update([
-                'isRated' => true
-            ]);
-
-            return response()->json([
-                'message' => 'Rating berhasil ditambahkan'
-            ]);
-        } else {
-            return response()->json([
-                'message' => 'Pastikan barangmu sudah sampai yaa:)'
-            ], 405);
-        }
+        // Mengembalikan response sukses
+        return response()->json([
+            'message' => 'Rating berhasil diberikan!',
+            'rating' => [
+                'rating_value' => $rating->rating,
+                'comment' => $rating->comment
+            ]
+        ]);
     }
 
 
@@ -105,4 +97,5 @@ class RatingController extends Controller
         $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
     }
+
 }
