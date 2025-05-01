@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Keranjang;
 use App\Models\Transaksi;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class DashController extends Controller
 {
@@ -29,7 +30,7 @@ class DashController extends Controller
     }
 
     // Admin dashboard bagian ORDER
-    public function all()
+    public function order()
     {
         $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])
             ->latest()
@@ -82,6 +83,40 @@ class DashController extends Controller
         }
 
         $response = array_values($Customers);
+        return response()->json($response);
+    }
+
+    #Customer dashboard MY ORDER
+    public function myOrder()
+    {
+        $user = Auth::user();
+        $transaksi = Transaksi::whereHas('keranjang', function ($query) use ($user) {
+            $query->where('id_user', $user->user_id);
+        })
+            ->with(['keranjang.produk'])
+            ->latest()->get();
+
+
+        $response = $transaksi->map(function ($transaksi) {
+            return [
+                'transaksi_id' => $transaksi->transaksi_id,
+                'status' => $transaksi->status,
+                'total_harga' => $transaksi->total,
+                'keranjang' => $transaksi->keranjang->map(function ($item) {
+                    return [
+                        'keranjang_id' => $item->keranjang_id,
+                        'produk_id' => $item->produk->produk_id,
+                        'nama_produk' => $item->produk->nama_produk,
+                        'ukuran' => $item->produk->ukuran,
+                        'israted' => $item->israted,
+                        'harga' => $item->produk->harga,
+                        'quantity' => $item->quantity,
+                        'gambar' => url('/storage/' . $item->produk->gambar)
+                    ];
+                }),
+            ];
+        });
+
         return response()->json($response);
     }
 }

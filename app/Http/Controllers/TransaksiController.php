@@ -130,38 +130,4 @@ class TransaksiController extends Controller
             'message' => 'Makanan sudah sampai ke tempat tujuan'
         ]);
     }
-
-    #Customer dashboard MY ORDER
-    public function show()
-    {
-        $user = Auth::user();
-        $transaksi = Transaksi::whereHas('keranjang', function ($query) use ($user) {
-            $query->where('id_user', $user->user_id);
-        })
-            ->with(['keranjang.produk'])
-            ->latest()->get();
-
-
-        $response = $transaksi->map(function ($transaksi) {
-            return [
-                'transaksi_id' => $transaksi->transaksi_id,
-                'status' => $transaksi->status,
-                'total_harga' => $transaksi->total,
-                'keranjang' => $transaksi->keranjang->map(function ($item) {
-                    return [
-                        'keranjang_id' => $item->keranjang_id,
-                        'produk_id' => $item->produk->produk_id,
-                        'nama_produk' => $item->produk->nama_produk,
-                        'ukuran' => $item->produk->ukuran,
-                        'israted' => $item->israted,
-                        'harga' => $item->produk->harga,
-                        'quantity' => $item->quantity,
-                        'gambar' => url('/storage/' . $item->produk->gambar)
-                    ];
-                }),
-            ];
-        });
-
-        return response()->json($response);
-    }
 }

@@ -18,8 +18,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/produk/delete/{id}', [ProdukController::class, 'destroy']);
 
         Route::get('/dashboard', [DashController::class, 'index']);
-        Route::get('/dashboard/order', [DashController::class, 'all']);
+        Route::get('/dashboard/order', [DashController::class, 'order']);
         Route::get('/dashboard/customer', [DashController::class, 'customer']);
+
+        Route::get('/transaksi', [DashController::class, 'myOrder']);
     });
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/aboutMe', [AuthController::class, 'aboutMe']);
@@ -38,7 +40,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/ulasan', [RatingController::class, 'unrated']);
     Route::post('/ulasan/{id}', [RatingController::class, 'rating']);
 
-    Route::get('/transaksi', [TransaksiController::class, 'show']);
     Route::get('/bayar', [TransaksiController::class, 'store']);
     Route::get('/bayar/berhasil/{id}', [TransaksiController::class, 'berhasil']);
     Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
