@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Keranjang;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +48,7 @@ class DashController extends Controller
         return response()->json($response);
     }
 
-    //Admin Dashboard bagian Customer
+    //Admin Dashboard bagian Customer //MASIH SALAH
     public function customer()
     {
         $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])

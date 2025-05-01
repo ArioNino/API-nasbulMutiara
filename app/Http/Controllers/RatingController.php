@@ -48,49 +48,43 @@ class RatingController extends Controller
         return response()->json($response);
     }
 
-    public function rating(Request $request, $keranjang_id) {
+    public function rating(Request $request, $id){
         $user = Auth::user();
-
-        // Validasi data input
-        $request->validate([
-            'rating' => 'required|integer|min:1|max:5', // rating antara 1 dan 5
-            'comment' => 'nullable|string|max:255', // komentar opsional
+        $data = $request->validate([
+            'rating' => "required"
         ]);
-
-        // Cek apakah keranjang milik user yang sedang login
-        $keranjang = Keranjang::where('keranjang_id', $keranjang_id)
-            ->whereHas('transaksi', function ($query) use ($user) {
-                $query->where('status', 'delivered')
-                      ->where('id_user', $user->user_id);
-            })
-            ->first();
-
-        // Jika keranjang tidak ditemukan atau tidak milik user, return error
-        if (!$keranjang) {
-            return response()->json(['message' => 'Keranjang tidak ditemukan atau bukan milik anda.'], 404);
+        $keranjang = Keranjang::with('transaksi')->find($id);
+        if(!$keranjang->id_transaksi){
+            return response()->json([
+                'message' => 'Produk belum dibeli'
+            ], 405);
+        }else{
+            if ($keranjang->isRated == true) {
+                return response()->json([
+                    'message' => 'Sudah dirating.'
+                ], 405);
+            }else{
+                if($keranjang->transaksi->status == 'delivered'){
+                    $rating = Rating::create([
+                        'id_keranjang'=> $id,
+                        'rating'=>$request->rating,
+                        'comment'=>$request->comment,
+                    ]);
+                    $keranjang->update([
+                        'israted' => true
+                    ]);
+                    return response()->json([
+                        'message' => 'Rating berhasil ditambahkan'
+                    ]);
+                }
+                else{
+                    return response()->json([
+                        'message' => 'Pastikan barangmu sudah sampai yaa:)'
+                    ], 405);
+                }
+            }
         }
-
-        // Menyimpan rating dan komentar
-        $rating = new Rating();
-        $rating->keranjang_id = $keranjang->keranjang_id;
-        $rating->rating = $request->rating;
-        $rating->comment = $request->comment;
-        $rating->save();
-
-        // Update status israted pada keranjang menjadi 1
-        $keranjang->israted = 1;
-        $keranjang->save();
-
-        // Mengembalikan response sukses
-        return response()->json([
-            'message' => 'Rating berhasil diberikan!',
-            'rating' => [
-                'rating_value' => $rating->rating,
-                'comment' => $rating->comment
-            ]
-        ]);
     }
-
 
     public static function quickRandom($length = 16)
     {
