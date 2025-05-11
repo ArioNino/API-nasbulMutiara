@@ -24,6 +24,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/aboutMe', [AuthController::class, 'aboutMe']);
     Route::post('/aboutMe/update', [AuthController::class, 'update']);
+    Route::post('/aboutMe/updatePhoto', [AuthController::class, 'updatePhoto']);
 
     Route::get('/alamat', [AlamatController::class, 'show']);
     Route::post('/alamat/add', [AlamatController::class, 'store']);
@@ -38,7 +39,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/ulasan', [RatingController::class, 'unrated']);
     Route::post('/ulasan/{id}', [RatingController::class, 'rating']);
 
-    Route::get('/bayar', [TransaksiController::class, 'store']);
+    Route::post('/bayar', [TransaksiController::class, 'store']);
     Route::get('/bayar/berhasil/{id}', [TransaksiController::class, 'berhasil']);
     Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
     Route::get('/masak/{id}', [TransaksiController::class, 'masak'])->middleware('admin');

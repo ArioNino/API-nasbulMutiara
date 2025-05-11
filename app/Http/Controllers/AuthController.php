@@ -98,4 +98,49 @@ class AuthController extends Controller
             'picture' => $user->picture ? url('/storage/' . $user->picture) : null
         ]);
     }
+
+     public function updatePhoto(Request $request)
+    {
+        $user = Auth::user();
+        if ($request->hasFile('picture')) {
+            $pathLama = storage_path('app/public/' . $user->picture);
+            if (File::exists($pathLama)) {
+                File::delete($pathLama);
+            }
+            $file = $request->file('picture');
+            $fileName = $this->quickRandom() . '.' . $file->extension();
+            $path = $file->storeAs('foto_profile', $fileName, 'public');
+            $user->update([
+                'picture' => $path
+            ]);
+            return response()->json([
+                'message' => 'Foto profile berhasil di-update'
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Foto profile gagal dii-update'
+            ], 500);
+        }
+    }
+
+     public function update(Request $request)
+    {
+        $user = Auth::user();
+        $request_data = $request->validate([
+            'username' => 'required',
+            'name' => 'required',
+            'gender' => 'required',
+            'phone' => 'required'
+        ]);
+        $user->update($request_data);
+        return response()->json([
+            'message' => 'Data profile telah diupdate'
+        ]);
+    }
+
+    public static function quickRandom($length = 16)
+    {
+        $pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
+    }
 }

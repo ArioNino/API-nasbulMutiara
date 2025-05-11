@@ -43,6 +43,7 @@ class ProdukController extends Controller
                 'stok' => $request->stok
             ]);
 
+
             if($request->hasFile('gambar')){
                 $file = $request->file('gambar');
                 $fileName = $this->quickRandom().$data->produk_id.'.'.$file->extension();
@@ -51,6 +52,7 @@ class ProdukController extends Controller
                     'gambar' => $path
                 ]);
             }
+
 
             return response()->json([
                 'message' => 'Produk berhasil ditambah'
