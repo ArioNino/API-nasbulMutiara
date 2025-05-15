@@ -41,6 +41,8 @@ class AlamatController extends Controller
             'kecamatan' => 'required',
             'kabupaten' => 'required',
             'provinsi' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
         ]);
 
         $user = Auth::user();
@@ -57,6 +59,8 @@ class AlamatController extends Controller
                 'kecamatan' => $data['kecamatan'],
                 'kabupaten' => $data['kabupaten'],
                 'provinsi' => $data['provinsi'],
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
                 'isPrimary' => 1,
             ]);
         } else {
@@ -70,6 +74,8 @@ class AlamatController extends Controller
                 'kecamatan' => $data['kecamatan'],
                 'kabupaten' => $data['kabupaten'],
                 'provinsi' => $data['provinsi'],
+                'latitude' => $data['latitude'],
+                'longitude' => $data['longitude'],
                 'isPrimary' => 0,
             ]);
         }
@@ -91,6 +97,8 @@ class AlamatController extends Controller
             'kecamatan' => 'required',
             'kabupaten' => 'required',
             'provinsi' => 'required',
+            'latitude' => 'required',
+            'longitude' => 'required',
             'isPrimary' => 'integer',
             'catatan_kurir' => 'nullable|string',
         ]);
