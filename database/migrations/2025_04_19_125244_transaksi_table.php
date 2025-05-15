@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,9 +15,9 @@ return new class extends Migration
             $table->integer('total');
             $table->string('status');
             $table->foreignId('id_alamat')
+                ->nullable() 
                 ->constrained('alamat', 'alamat_id')
-                ->noActionOnUpdate()
-                ->noActionOnDelete();
+                ->nullOnDelete();
             $table->longText('snaptoken');
             $table->timestamps();
         });
