@@ -22,6 +22,8 @@ class Alamat extends Model
         'kecamatan',
         'kabupaten',
         'provinsi',
+        'latitude',
+        'longitude',
         'isPrimary',
     ];
 

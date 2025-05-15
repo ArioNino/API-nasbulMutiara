@@ -42,6 +42,7 @@ class DashController extends Controller
                 'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
                 'nama_pembeli' => $transaksi->alamat->nama_penerima,
                 'total_harga' => $transaksi->total,
+                'alamat' => $transaksi->alamat,
                 'status' => $transaksi->status
             ];
         });
