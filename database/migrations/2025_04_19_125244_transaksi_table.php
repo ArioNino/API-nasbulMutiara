@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->id('transaksi_id');
             $table->integer('total');
             $table->string('status');
+            $table->string('jenis_pembayaran');
             $table->foreignId('id_alamat')
-                ->nullable() 
+                ->nullable()
                 ->constrained('alamat', 'alamat_id')
                 ->nullOnDelete();
             $table->longText('snaptoken');

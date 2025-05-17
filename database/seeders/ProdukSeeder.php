@@ -14,8 +14,8 @@ class ProdukSeeder extends Seeder
     public function run(): void
     {
         Produk::create([
-            "nama_produk"=>"Nasi Kebuli sapi",
-            "kategori"=>"SAPI",
+            "nama_produk"=> "Nasi Kebuli sapi",
+            "kategori"=> "SAPI",
             "deskripsi"=> "Nasi kebuli dengan topping daging sapi",
             "ukuran"=> "L",
             "harga"=> 55000,

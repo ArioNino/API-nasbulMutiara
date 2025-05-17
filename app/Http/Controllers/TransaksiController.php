@@ -37,33 +37,44 @@ class TransaksiController extends Controller
                 'stok' => $stockBaru
             ]);
         }
+        if ($request->jenis_pembayaran == 'transfer') {
+            Config::$serverKey = config('midtrans.serverKey');
+            Config::$isProduction = config('midtrans.isProduction');
+            Config::$isSanitized = config('midtrans.isSanitized');
+            Config::$is3ds = config('midtrans.is3ds');
 
-        Config::$serverKey = config('midtrans.serverKey');
-        Config::$isProduction = config('midtrans.isProduction');
-        Config::$isSanitized = config('midtrans.isSanitized');
-        Config::$is3ds = config('midtrans.is3ds');
+            $transaction_details = array(
+                'order_id' => rand(),
+                'gross_amount' => $request->total
+            );
+            $customer_details = array(
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'email' => $user->email
+            );
+            $params = array(
+                'transaction_details' => $transaction_details,
+                'customer_details' => $customer_details
+            );
 
-        $transaction_details = array(
-            'order_id' => rand(),
-            'gross_amount' => $request->total
-        );
-        $customer_details = array(
-            'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
-            'email' => $user->email
-        );
-        $params = array(
-            'transaction_details' => $transaction_details,
-            'customer_details' => $customer_details
-        );
+            $snapToken = Snap::getSnapToken($params);
+            $transaksi = Transaksi::create([
+                'total' => $request->total,
+                'status' => 'pending',
+                'id_alamat' => $request->id_alamat,
+                'snaptoken' => $snapToken
+            ]);
+        }
 
-        $snapToken = Snap::getSnapToken($params);
-        $transaksi = Transaksi::create([
-            'total' => $request->total,
-            'status' => 'pending',
-            'id_alamat' => $request->id_alamat,
-            'snaptoken' => $snapToken
-        ]);
+        else{
+             $transaksi = Transaksi::create([
+                'total' => $request->total,
+                'status' => 'pending',
+                'id_alamat' => $request->id_alamat,
+                'snaptoken' => 'COD'
+            ]);
+        }
+
         foreach ($request->id_item as $id_item) {
             $cari = Keranjang::findOrFail($id_item);
             $cari->update([
@@ -80,7 +91,7 @@ class TransaksiController extends Controller
     {
         $transaksi = Transaksi::findOrFail($id);
         $transaksi->update([
-            'status' => 'success'
+            'status' => 'Paid'
         ]);
         return response()->json([
             'message' => 'Transaksi berhasil dibayar'
