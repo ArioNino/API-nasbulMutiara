@@ -16,7 +16,8 @@ class TransaksiController extends Controller
         $user = Auth::user();
         $data = $request->validate([
             'total' => 'required',
-            'id_alamat' => 'required'
+            'id_alamat' => 'required',
+            'jenis_pembayaran' => 'required'
         ]);
 
         foreach ($request->id_item as $id_item) {
@@ -61,6 +62,7 @@ class TransaksiController extends Controller
             $transaksi = Transaksi::create([
                 'total' => $request->total,
                 'status' => 'pending',
+                'jenis_pembayaran' => 'transfer',
                 'id_alamat' => $request->id_alamat,
                 'snaptoken' => $snapToken
             ]);
@@ -70,6 +72,7 @@ class TransaksiController extends Controller
              $transaksi = Transaksi::create([
                 'total' => $request->total,
                 'status' => 'pending',
+                'jenis_pembayaran' => 'Tunai',
                 'id_alamat' => $request->id_alamat,
                 'snaptoken' => 'COD'
             ]);
