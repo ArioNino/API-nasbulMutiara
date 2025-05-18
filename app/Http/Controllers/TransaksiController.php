@@ -62,7 +62,7 @@ class TransaksiController extends Controller
             $transaksi = Transaksi::create([
                 'total' => $request->total,
                 'status' => 'pending',
-                'jenis_pembayaran' => 'transfer',
+                'jenis_pembayaran' => 'Transfer',
                 'id_alamat' => $request->id_alamat,
                 'snaptoken' => $snapToken
             ]);

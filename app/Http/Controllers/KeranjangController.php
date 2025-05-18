@@ -46,8 +46,38 @@ class KeranjangController extends Controller
         return response()->json(KeranjangResource::collection($cari));
     }
 
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id_item' => 'required|exists:keranjang,id',
+            'action' => 'required|in:increase,decrease',
+        ]);
 
-    public function delete(Request $request){
+        $item = Keranjang::findOrFail($request->id_item);
+
+        if ($request->action === 'increase') {
+            $item->quantity += 1;
+        } elseif ($request->action === 'decrease') {
+            $item->quantity -= 1;
+            if ($item->quantity <= 0) {
+                $item->delete();
+                return response()->json([
+                    'message' => 'Item dihapus karena quantity menjadi 0'
+                ]);
+            }
+        }
+
+        $item->save();
+
+        return response()->json([
+            'message' => 'Jumlah item berhasil diperbarui',
+            'data' => $item
+        ]);
+    }
+
+
+    public function delete(Request $request)
+    {
         foreach ($request->id_item as $id_item) {
             $cari = Keranjang::findOrFail($id_item);
             $cari->delete();
@@ -56,7 +86,7 @@ class KeranjangController extends Controller
             'message' => 'Item berhasil dihapus dari keranjang'
         ]);
     }
-    
+
     // public function delete($id)
     // {
     //     $produk = Keranjang::findOrFail($id);
