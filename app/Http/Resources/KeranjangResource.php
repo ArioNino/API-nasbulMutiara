@@ -20,6 +20,7 @@ class KeranjangResource extends JsonResource
             'gambar' => $this->produk->gambar,
             'quantity'=>$this->quantity,
             'harga' => $this->produk->harga,
+            'ukuran' => $this->produk->ukuran,
             'gambar' => 'http://127.0.0.1:8000/storage/'.$this->produk->gambar
         ];
     }

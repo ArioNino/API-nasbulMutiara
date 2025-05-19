@@ -17,7 +17,7 @@ class KeranjangController extends Controller
             ->where('id_transaksi', null)
             ->first();
 
-        if ($cari === null) { // Pengecekan jika item belum ada di keranjang
+        if ($cari === null) {
             $data = Keranjang::create([
                 'id_user' => $user->user_id,
                 'id_produk' => $request->id_produk,
@@ -28,7 +28,7 @@ class KeranjangController extends Controller
                 'message' => 'Item telah ditambahkan',
                 'data' => $data
             ]);
-        } else { // Jika item sudah ada di keranjang
+        } else {
             $cari->update([
                 'quantity' => $cari->quantity + $request->quantity
             ]);
@@ -46,34 +46,34 @@ class KeranjangController extends Controller
         return response()->json(KeranjangResource::collection($cari));
     }
 
-    public function update(Request $request)
-    {
-        $request->validate([
-            'id_item' => 'required|exists:keranjang,id',
-            'action' => 'required|in:increase,decrease',
-        ]);
+    // public function update(Request $request)
+    // {
+    //     $request->validate([
+    //         'id_item' => 'required|exists:keranjang,id',
+    //         'action' => 'required|in:increase,decrease',
+    //     ]);
 
-        $item = Keranjang::findOrFail($request->id_item);
+    //     $item = Keranjang::findOrFail($request->id_item);
 
-        if ($request->action === 'increase') {
-            $item->quantity += 1;
-        } elseif ($request->action === 'decrease') {
-            $item->quantity -= 1;
-            if ($item->quantity <= 0) {
-                $item->delete();
-                return response()->json([
-                    'message' => 'Item dihapus karena quantity menjadi 0'
-                ]);
-            }
-        }
+    //     if ($request->action === 'increase') {
+    //         $item->quantity += 1;
+    //     } elseif ($request->action === 'decrease') {
+    //         $item->quantity -= 1;
+    //         if ($item->quantity <= 0) {
+    //             $item->delete();
+    //             return response()->json([
+    //                 'message' => 'Item dihapus karena quantity menjadi 0'
+    //             ]);
+    //         }
+    //     }
 
-        $item->save();
+    //     $item->save();
 
-        return response()->json([
-            'message' => 'Jumlah item berhasil diperbarui',
-            'data' => $item
-        ]);
-    }
+    //     return response()->json([
+    //         'message' => 'Jumlah item berhasil diperbarui',
+    //         'data' => $item
+    //     ]);
+    // }
 
 
     public function delete(Request $request)

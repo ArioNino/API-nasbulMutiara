@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/keranjang', [KeranjangController::class, 'show']);
     Route::post('/keranjang/add', [KeranjangController::class, 'add']);
     Route::delete('/keranjang/delete', [KeranjangController::class, 'delete']);
-    Route::delete('/keranjang/update', [KeranjangController::class, 'update']);
+    Route::post('/keranjang/update', [KeranjangController::class, 'update']);
 
     Route::get('/ulasan', [RatingController::class, 'unrated']);
     Route::post('/ulasan/{id}', [RatingController::class, 'rating']);
