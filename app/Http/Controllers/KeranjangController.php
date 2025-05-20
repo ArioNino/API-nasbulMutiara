@@ -46,35 +46,44 @@ class KeranjangController extends Controller
         return response()->json(KeranjangResource::collection($cari));
     }
 
-    // public function update(Request $request)
-    // {
-    //     $request->validate([
-    //         'id_item' => 'required|exists:keranjang,id',
-    //         'action' => 'required|in:increase,decrease',
-    //     ]);
+    public function update(Request $request)
+    {
+        $request->validate([
+            'id_item' => 'required',
+            'action' => 'required',
+        ]);
 
-    //     $item = Keranjang::findOrFail($request->id_item);
+        $user = Auth::user();
+        $keranjang = Keranjang::where('keranjang_id', $request->id_item)
+            ->where('id_user', $user->user_id)
+            ->whereNull('id_transaksi')
+            ->first();
 
-    //     if ($request->action === 'increase') {
-    //         $item->quantity += 1;
-    //     } elseif ($request->action === 'decrease') {
-    //         $item->quantity -= 1;
-    //         if ($item->quantity <= 0) {
-    //             $item->delete();
-    //             return response()->json([
-    //                 'message' => 'Item dihapus karena quantity menjadi 0'
-    //             ]);
-    //         }
-    //     }
+        if (!$keranjang) {
+            return response()->json([
+                'message' => 'Item tidak ditemukan di keranjang'
+            ], 404);
+        }
 
-    //     $item->save();
+        if ($request->action === 'increase') {
+            $keranjang->quantity += 1;
+        } elseif ($request->action === 'decrease') {
+            if ($keranjang->quantity > 1) {
+                $keranjang->quantity -= 1;
+            } else {
+                return response()->json([
+                    'message' => 'Quantity tidak boleh kurang dari 1'
+                ], 400);
+            }
+        }
 
-    //     return response()->json([
-    //         'message' => 'Jumlah item berhasil diperbarui',
-    //         'data' => $item
-    //     ]);
-    // }
+        $keranjang->save();
 
+        return response()->json([
+            'message' => 'Quantity berhasil diperbarui',
+            'data' => $keranjang
+        ]);
+    }
 
     public function delete(Request $request)
     {
@@ -86,12 +95,5 @@ class KeranjangController extends Controller
             'message' => 'Item berhasil dihapus dari keranjang'
         ]);
     }
-
-    // public function delete($id)
-    // {
-    //     $produk = Keranjang::findOrFail($id);
-    //     $produk->delete();
-    //     return response()->json(['message' => 'Keranjang berhasil dihapus']);
-    // }
 }
 

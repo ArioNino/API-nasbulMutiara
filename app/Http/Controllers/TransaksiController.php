@@ -71,7 +71,7 @@ class TransaksiController extends Controller
         else{
              $transaksi = Transaksi::create([
                 'total' => $request->total,
-                'status' => 'pending',
+                'status' => 'on process',
                 'jenis_pembayaran' => 'Tunai',
                 'id_alamat' => $request->id_alamat,
                 'snaptoken' => 'COD'

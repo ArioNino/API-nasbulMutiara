@@ -42,7 +42,7 @@ class DashController extends Controller
                 'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
                 'nama_pembeli' => $transaksi->alamat->nama_penerima,
                 'total_harga' => $transaksi->total,
-                // 'alamat' => $transaksi->alamat,
+                'alamat' => $transaksi->alamat,
                 'status' => $transaksi->status
             ];
         });
@@ -134,24 +134,6 @@ class DashController extends Controller
             ];
         });
 
-        return response()->json($response);
-    }
-
-    public function kurir(){
-         $transaksi = Transaksi::with(['keranjang.produk', 'alamat'])
-            ->where('status', 'on process')
-            ->latest()
-            ->get();
-
-     $response = $transaksi->map(function ($transaksi) {
-            return [
-                'transaksi_id' => $transaksi->transaksi_id,
-                'nama_pembeli' => $transaksi->alamat->nama_penerima,
-                'total_harga' => $transaksi->total,
-                'alamat' => $transaksi->alamat,
-                'status' => $transaksi->status
-            ];
-        });
         return response()->json($response);
     }
 }
