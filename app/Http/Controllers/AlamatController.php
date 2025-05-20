@@ -129,11 +129,11 @@ class AlamatController extends Controller
         $user = Auth::user();
         $cari = Alamat::where('alamat_id', $id)->first();
         $primary = Alamat::where('id_user', $user->user_id)->where('isPrimary', true)->first();
-        $cari->update([
-            'isPrimary' => true
-        ]);
         $primary->update([
             'isPrimary' => false
+        ]);
+        $cari->update([
+            'isPrimary' => true
         ]);
         return response()->json([
             'message' => 'Alamat utama telah diganti'
