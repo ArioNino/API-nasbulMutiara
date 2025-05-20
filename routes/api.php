@@ -21,6 +21,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/dashboard/order', [DashController::class, 'order']);
         Route::get('/dashboard/customer', [DashController::class, 'customer']);
     });
+    Route::get('/dashboard/kurir', [DashController::class, 'kurir'])->middleware('kurir');
+
     Route::get('/logout', [AuthController::class, 'logout']);
     Route::get('/aboutMe', [AuthController::class, 'aboutMe']);
     Route::post('/aboutMe/update', [AuthController::class, 'update']);
@@ -45,9 +47,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/bayar/gagal/{id}', [TransaksiController::class, 'gagal']);
     Route::get('/masak/{id}', [TransaksiController::class, 'masak'])->middleware('admin');
     Route::get('/otw/{id}', [TransaksiController::class, 'otw'])->middleware('admin');
-    Route::get('/sampai/{id}', [TransaksiController::class, 'sampai']);//->middleware('kurir');
+    Route::get('/sampai/{id}', [TransaksiController::class, 'sampai']);
 
-    Route::get('/transaksi', [DashController::class, 'myOrder']); //Customer Dashboard
+    Route::get('/transaksi', [DashController::class, 'myOrder']);
 });
 
 Route::post('/register', [AuthController::class, 'register']);
