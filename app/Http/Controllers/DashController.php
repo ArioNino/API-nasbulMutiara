@@ -75,7 +75,8 @@ class DashController extends Controller
                 }
             }
 
-            if (!$alamat) continue;
+            if (!$alamat)
+                continue;
 
             $namaPenerima = $alamat->nama_penerima;
 
@@ -118,6 +119,7 @@ class DashController extends Controller
             return [
                 'transaksi_id' => $transaksi->transaksi_id,
                 'status' => $transaksi->status,
+                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
                 'total_harga' => $transaksi->total,
                 'keranjang' => $transaksi->keranjang->map(function ($item) {
                     return [
@@ -133,6 +135,42 @@ class DashController extends Controller
                 }),
             ];
         });
+
+        return response()->json($response);
+    }
+
+    public function orderDetail($id)
+    {
+        $user = Auth::user();
+
+        $transaksi = Transaksi::where('transaksi_id', $id)
+            ->whereHas('keranjang', function ($query) use ($user) {
+                $query->where('id_user', $user->user_id);
+            })
+            ->with(['keranjang.produk'])
+            ->first();
+
+        if (!$transaksi) {
+            return response()->json(['message' => 'Transaksi tidak ditemukan atau tidak milik Anda.'], 404);
+        }
+
+        $response = [
+            'transaksi_id' => $transaksi->transaksi_id,
+            'status' => $transaksi->status,
+            'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
+            'jenis_pembayaran' => $transaksi->jenis_pembayaran,
+            'total_harga' => $transaksi->total,
+            'keranjang' => $transaksi->keranjang->map(function ($item) {
+                return [
+                    'produk_id' => $item->produk->produk_id,
+                    'nama_produk' => $item->produk->nama_produk,
+                    'ukuran' => $item->produk->ukuran,
+                    'harga' => $item->produk->harga,
+                    'quantity' => $item->quantity,
+                    'gambar' => url('/storage/' . $item->produk->gambar),
+                ];
+            }),
+        ];
 
         return response()->json($response);
     }

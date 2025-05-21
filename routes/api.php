@@ -49,7 +49,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/otw/{id}', [TransaksiController::class, 'otw'])->middleware('admin');
     Route::get('/sampai/{id}', [TransaksiController::class, 'sampai']);
 
-    Route::get('/transaksi', [DashController::class, 'myOrder']);
+    Route::get('/transaksi', [DashController::class, 'myOrder']); //dashboard customer liat order
+    Route::get('/transaksi/{id}', [DashController::class, 'orderDetail']); //dashboard customer liat order
 });
 
 Route::post('/register', [AuthController::class, 'register']);
