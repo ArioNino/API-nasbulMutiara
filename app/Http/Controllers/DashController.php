@@ -39,7 +39,7 @@ class DashController extends Controller
         $response = $transaksi->map(function ($transaksi) {
             return [
                 'transaksi_id' => $transaksi->transaksi_id,
-                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
+                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y H:i'),
                 'nama_pembeli' => $transaksi->alamat->nama_penerima,
                 'total_harga' => $transaksi->total,
                 'alamat' => $transaksi->alamat,
@@ -119,7 +119,7 @@ class DashController extends Controller
             return [
                 'transaksi_id' => $transaksi->transaksi_id,
                 'status' => $transaksi->status,
-                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
+                'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y H:i'),
                 'total_harga' => $transaksi->total,
                 'keranjang' => $transaksi->keranjang->map(function ($item) {
                     return [
