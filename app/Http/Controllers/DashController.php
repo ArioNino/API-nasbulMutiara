@@ -157,7 +157,7 @@ class DashController extends Controller
         $response = [
             'transaksi_id' => $transaksi->transaksi_id,
             'status' => $transaksi->status,
-            'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y h:i'),
+            'tanggal_pembelian' => $transaksi->created_at->format('d-M-Y H:i'),
             'jenis_pembayaran' => $transaksi->jenis_pembayaran,
             'total_harga' => $transaksi->total,
             'keranjang' => $transaksi->keranjang->map(function ($item) {
@@ -174,4 +174,6 @@ class DashController extends Controller
 
         return response()->json($response);
     }
+
+
 }
